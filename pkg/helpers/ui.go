@@ -7,7 +7,7 @@ import (
 	"github.com/charmbracelet/lipgloss"
 )
 
-var confirmStyle = lipgloss.NewStyle().Foreground(lipgloss.Color("%FFD700")).Bold(true)
+var confirmStyle = lipgloss.NewStyle().Background(lipgloss.Color("%FFD700")).Bold(true)
 
 func ConfirmPrompt(message string) (bool, error) {
 	fmt.Print(confirmStyle.Render(message + " [y/N]:"))

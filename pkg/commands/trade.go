@@ -71,9 +71,9 @@ func trade(database *sql.DB) func(c *cli.Context) error {
 		}
 
 		if confirmation {
-			log.Info("Inserted successfully!")
+			log.Info("Operation inserted successfully!")
 		} else {
-			log.Warn("Not done!")
+			log.Warn("Operation couldn't proceed!")
 		}
 
 		return nil
@@ -83,12 +83,12 @@ func trade(database *sql.DB) func(c *cli.Context) error {
 func TradeCommand(database *sql.DB) *cli.Command {
 
 	return &cli.Command{
-		Name:    "trade",
-		Aliases: []string{"t"},
-		Usage:   "Register a trade operation (buy or sell)",
+		Name:  "trade",
+		Usage: "Register a trade operation (buy or sell)",
 		Flags: []cli.Flag{
 			&cli.StringFlag{
 				Name:     "ticker",
+				Aliases:  []string{"t"},
 				Usage:    "Name of the stock, e.g.: AAPL, BTC",
 				Required: true,
 			},
@@ -103,18 +103,21 @@ func TradeCommand(database *sql.DB) *cli.Command {
 				Aliases: []string{"s"},
 			},
 			&cli.Float64Flag{
-				Name:     "qty",
+				Name:     "quantity",
+				Aliases:  []string{"q"},
 				Usage:    "Quantity of stocks",
 				Required: true,
 			},
 			&cli.Float64Flag{
 				Name:     "price",
 				Usage:    "Price of ticker",
+				Aliases:  []string{"p"},
 				Required: true,
 			},
 			&cli.StringFlag{
 				Name:     "currency",
 				Usage:    "Currency: BRL or USD",
+				Aliases:  []string{"c"},
 				Required: true,
 			},
 			&cli.Float64Flag{

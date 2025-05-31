@@ -25,6 +25,7 @@ func main() {
 		Usage: "Track stocks buys and sells",
 		Commands: []*cli.Command{
 			commands.TradeCommand(database),
+			commands.ListCommand(database),
 		},
 	}
 

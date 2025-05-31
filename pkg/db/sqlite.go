@@ -2,7 +2,6 @@ package db
 
 import (
 	"database/sql"
-	"fmt"
 	"os"
 	"time"
 
@@ -26,7 +25,6 @@ func InitDB(path string) (*sql.DB, error) {
 func CreateTables(db *sql.DB, path string) error {
 	log.Info("Initializing tables...")
 	content, err := os.ReadFile(path)
-	fmt.Println(content)
 	if err != nil {
 		return nil
 	}
@@ -45,7 +43,7 @@ func InsertTrade(db *sql.DB, trade models.Trade) error {
 }
 
 func GetAllTrades(db *sql.DB) ([]models.Trade, error) {
-	rows, err := db.Query("SELECT id, stock, price, quantity, date, operation, tax, currency FROM trades")
+	rows, err := db.Query("SELECT id, ticker, price, quantity, date, operation, tax, currency FROM trades")
 	if err != nil {
 		return nil, err
 	}
