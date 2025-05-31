@@ -81,6 +81,7 @@ func trade(database *sql.DB) func(c *cli.Context) error {
 }
 
 func TradeCommand(database *sql.DB) *cli.Command {
+	// signed
 
 	return &cli.Command{
 		Name:    "trade",
