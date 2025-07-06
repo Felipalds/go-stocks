@@ -4,6 +4,7 @@ import (
 	"database/sql"
 	"errors"
 	"fmt"
+	"strings"
 	"time"
 
 	"github.com/Felipalds/go-stocks/pkg/db"
@@ -17,7 +18,7 @@ import (
 func trade(database *sql.DB) func(c *cli.Context) error {
 	return func(c *cli.Context) error {
 
-		ticker := c.String("ticker")
+		ticker := strings.ToUpper(c.String("ticker"))
 		qty := c.Float64("quantity")
 		price := c.Float64("price")
 		currency := c.String("currency")
