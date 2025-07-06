@@ -26,6 +26,7 @@ func main() {
 		Commands: []*cli.Command{
 			commands.TradeCommand(database),
 			commands.ListCommand(database),
+			commands.ResumeCommand(database),
 		},
 	}
 
