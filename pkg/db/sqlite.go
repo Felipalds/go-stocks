@@ -64,5 +64,10 @@ func GetAllTrades(db *sql.DB) ([]models.Trade, error) {
 		trades = append(trades, t)
 	}
 	return trades, nil
+}
 
+// https://sqlite.org/lang_upsert.html
+func UpdateStockPrices(db *sql.DB, ticker string, price float64) error {
+
+	return nil
 }

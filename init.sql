@@ -8,3 +8,10 @@ CREATE TABLE IF NOT EXISTS trades (
   tax REAL,
   currency TEXT
 )
+
+CREATE TABLE IF NOT EXISTS prices (
+  id INTEGER PRIMARY KEY AUTOINCREMENT,
+  ticker TEXT,
+  price REAL,
+  currency TEXT
+)
