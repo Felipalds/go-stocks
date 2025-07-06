@@ -1,2 +1,4 @@
 .termdbms
 data.db
+*.x
+go-stocks

@@ -18,7 +18,7 @@ func trade(database *sql.DB) func(c *cli.Context) error {
 	return func(c *cli.Context) error {
 
 		ticker := c.String("ticker")
-		qty := c.Float64("qty")
+		qty := c.Float64("quantity")
 		price := c.Float64("price")
 		currency := c.String("currency")
 		tax := c.Float64("tax")
@@ -57,7 +57,8 @@ func trade(database *sql.DB) func(c *cli.Context) error {
 			Currency:  models.Currency(currency),
 		}
 
-		fmt.Println(trade)
+		fmt.Println("Confirm the trade: ")
+		fmt.Printf("Ticker: %s, Price: %.2f, Quantity %.2f, Date: %s, Operation %s, Tax: %.2f, Currency: %s \n", trade.Ticker, trade.Price, trade.Quantity, trade.Date, trade.Operation, trade.Tax, trade.Currency)
 		prompt := fmt.Sprintln("Wish you continue?")
 
 		confirmation, err := helpers.ConfirmPrompt(prompt)
