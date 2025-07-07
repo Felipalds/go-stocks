@@ -12,17 +12,23 @@ import (
 )
 
 // sum of all multiplication of Trade.price by Trade.quantity
-func getAllAmountOfMoney(trades []models.Trade) float64 {
+func getAllAmountOfMoney(database *sql.DB, trades []models.Trade) float64 {
 	// TODO: add a separation by CURRENCY. It will need to have a table of relations of currencies
 	// today it does by BRL only
 	total := 0.0
 	dollarPrice := helpers.GetDollarInBRL()
 
 	for _, trade := range trades {
+
+		stockPrice, err := db.GetStockPrice(database, trade.Ticker)
+		if err != nil {
+			log.Fatal("Error on function getAllAmountOfMoney: %w", err)
+		}
+
 		if trade.Currency == models.BRL {
-			total += trade.Price * trade.Quantity
+			total += stockPrice.Price * trade.Quantity
 		} else if trade.Currency == models.USD {
-			total += trade.Price * trade.Quantity * dollarPrice
+			total += stockPrice.Price * trade.Quantity * dollarPrice
 		} else {
 			log.Warn("Invalid currency found")
 			continue
@@ -40,7 +46,7 @@ func resume(database *sql.DB) func(c *cli.Context) error {
 			return err
 		}
 
-		fmt.Println("Amount of money: R$", getAllAmountOfMoney(trades))
+		fmt.Println("Amount of money: R$", getAllAmountOfMoney(database, trades))
 		return nil
 
 	}

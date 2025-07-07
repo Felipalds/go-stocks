@@ -2,6 +2,7 @@ package db
 
 import (
 	"database/sql"
+	"fmt"
 	"os"
 	"time"
 
@@ -66,8 +67,33 @@ func GetAllTrades(db *sql.DB) ([]models.Trade, error) {
 	return trades, nil
 }
 
+func GetStockPrice(db *sql.DB, ticker string) (*models.StockPrice, error) {
+	var stock_price models.StockPrice
+	query := `SELECT id, ticker, price, currency FROM stock_prices WHERE ticker = ? LIMIT 1`
+	err := db.QueryRow(query, ticker).Scan(&stock_price.ID, &stock_price.Ticker, &stock_price.Price, &stock_price.Currency)
+
+	if err == sql.ErrNoRows {
+		return nil, fmt.Errorf("ticker %s not found", ticker)
+	} else if err != nil {
+		return nil, fmt.Errorf("error querying ticker %s: %w", ticker, err)
+	}
+
+	return &stock_price, nil
+}
+
 // https://sqlite.org/lang_upsert.html
-func UpdateStockPrices(db *sql.DB, ticker string, price float64) error {
+func UpdateStockPrices(db *sql.DB, ticker string, price float64, currency models.Currency) error {
+
+	upsertSQL := `
+		INSERT INTO stock_prices (ticker, price, currency)
+	  VALUES (?, ?, ?)
+	  ON CONFLICT (ticker) DO UPDATE SET
+	  price = excluded.price;
+	`
+	_, err := db.Exec(upsertSQL, ticker, price, currency)
+	if err != nil {
+		return fmt.Errorf("error upserting ticker %w", err)
+	}
 
 	return nil
 }

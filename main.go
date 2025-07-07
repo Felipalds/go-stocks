@@ -27,6 +27,7 @@ func main() {
 			commands.TradeCommand(database),
 			commands.ListCommand(database),
 			commands.ResumeCommand(database),
+			commands.UpdatePriceCommand(database),
 		},
 	}
 
