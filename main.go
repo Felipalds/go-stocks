@@ -11,12 +11,8 @@ import (
 
 func main() {
 
-	database, err := db.InitDB("data.db")
-	path := "./init.sql"
+	err := db.InitDatabase()
 	if err != nil {
-		log.Fatal(err)
-	}
-	if err := db.CreateTables(database, path); err != nil {
 		log.Fatal(err)
 	}
 
@@ -24,10 +20,10 @@ func main() {
 		Name:  "Go Stocks",
 		Usage: "Track stocks buys and sells",
 		Commands: []*cli.Command{
-			commands.TradeCommand(database),
-			commands.ListCommand(database),
-			commands.ResumeCommand(database),
-			commands.UpdatePriceCommand(database),
+			commands.TradeCommand(),
+			commands.ListCommand(),
+			commands.ResumeCommand(),
+			commands.UpdatePriceCommand(),
 		},
 	}
 

@@ -1,7 +1,6 @@
 package commands
 
 import (
-	"database/sql"
 	"errors"
 	"fmt"
 	"strings"
@@ -15,7 +14,7 @@ import (
 	"github.com/urfave/cli/v2"
 )
 
-func trade(database *sql.DB) func(c *cli.Context) error {
+func trade() func(c *cli.Context) error {
 	return func(c *cli.Context) error {
 
 		ticker := strings.ToUpper(c.String("ticker"))
@@ -67,7 +66,7 @@ func trade(database *sql.DB) func(c *cli.Context) error {
 			return err
 		}
 
-		err = db.InsertTrade(database, trade)
+		err = db.InsertTrade(trade)
 		if err != nil {
 			return err
 		}
@@ -82,7 +81,7 @@ func trade(database *sql.DB) func(c *cli.Context) error {
 	}
 }
 
-func TradeCommand(database *sql.DB) *cli.Command {
+func TradeCommand() *cli.Command {
 
 	return &cli.Command{
 		Name:  "trade",
@@ -131,6 +130,6 @@ func TradeCommand(database *sql.DB) *cli.Command {
 				Usage: "Date of the operation in the format YYYY-MM-DD. If ommited, will be used today as date.",
 			},
 		},
-		Action: trade(database),
+		Action: trade(),
 	}
 }

@@ -1,7 +1,6 @@
 package commands
 
 import (
-	"database/sql"
 	"strings"
 
 	"github.com/Felipalds/go-stocks/pkg/db"
@@ -10,14 +9,14 @@ import (
 	"github.com/urfave/cli/v2"
 )
 
-func updatePrice(database *sql.DB) func(c *cli.Context) error {
+func updatePrice() func(c *cli.Context) error {
 
 	return func(c *cli.Context) error {
 		ticker := c.String("ticker")
 		price := c.Float64("price")
 		currency := models.Currency(strings.ToUpper(c.String("currency")))
 
-		err := db.UpdateStockPrices(database, ticker, price, currency)
+		err := db.UpdateStockPrices(ticker, price, currency)
 		if err != nil {
 			log.Fatal("Error updating price: %w", err)
 		}
@@ -27,7 +26,7 @@ func updatePrice(database *sql.DB) func(c *cli.Context) error {
 
 }
 
-func UpdatePriceCommand(database *sql.DB) *cli.Command {
+func UpdatePriceCommand() *cli.Command {
 
 	return &cli.Command{
 		Name:  "update-price",
@@ -52,7 +51,7 @@ func UpdatePriceCommand(database *sql.DB) *cli.Command {
 				Required: true,
 			},
 		},
-		Action: updatePrice(database),
+		Action: updatePrice(),
 	}
 
 }

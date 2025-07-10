@@ -1,7 +1,6 @@
 package commands
 
 import (
-	"database/sql"
 	"fmt"
 
 	"github.com/Felipalds/go-stocks/pkg/db"
@@ -12,7 +11,7 @@ import (
 )
 
 // sum of all multiplication of Trade.price by Trade.quantity
-func getAllAmountOfMoney(database *sql.DB, trades []models.Trade) float64 {
+func getAllAmountOfMoney(trades []models.Trade) float64 {
 	// TODO: add a separation by CURRENCY. It will need to have a table of relations of currencies
 	// today it does by BRL only
 	total := 0.0
@@ -20,7 +19,7 @@ func getAllAmountOfMoney(database *sql.DB, trades []models.Trade) float64 {
 
 	for _, trade := range trades {
 
-		stockPrice, err := db.GetStockPrice(database, trade.Ticker)
+		stockPrice, err := db.GetStockPrice(trade.Ticker)
 		if err != nil {
 			log.Fatal("Error on function getAllAmountOfMoney: %w", err)
 		}
@@ -39,20 +38,20 @@ func getAllAmountOfMoney(database *sql.DB, trades []models.Trade) float64 {
 
 }
 
-func resume(database *sql.DB) func(c *cli.Context) error {
+func resume() func(c *cli.Context) error {
 	return func(c *cli.Context) error {
-		trades, err := db.GetAllTrades(database)
+		trades, err := db.GetAllTrades()
 		if err != nil {
 			return err
 		}
 
-		fmt.Println("Amount of money: R$", getAllAmountOfMoney(database, trades))
+		fmt.Println("Amount of money: R$", getAllAmountOfMoney(trades))
 		return nil
 
 	}
 }
 
-func ResumeCommand(database *sql.DB) *cli.Command {
+func ResumeCommand() *cli.Command {
 	return &cli.Command{
 		Name:  "resume",
 		Usage: "Shows a resume of your wallet.",
@@ -64,6 +63,6 @@ func ResumeCommand(database *sql.DB) *cli.Command {
 				Usage:   "Filters the resume by a ticker",
 			},
 		},
-		Action: resume(database),
+		Action: resume(),
 	}
 }
