@@ -2,13 +2,6 @@ package models
 
 import "time"
 
-type Currency string
-
-const (
-	BRL Currency = "BRL"
-	USD Currency = "USD"
-)
-
 type Operation string
 
 const (

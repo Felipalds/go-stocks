@@ -1,29 +1,41 @@
 package commands
 
 import (
-	"database/sql"
 	"fmt"
 
 	"github.com/Felipalds/go-stocks/pkg/db"
 	"github.com/Felipalds/go-stocks/pkg/helpers"
+	"github.com/Felipalds/go-stocks/pkg/models"
 	"github.com/urfave/cli/v2"
 )
 
-func list(database *sql.DB) func(c *cli.Context) error {
+func list() func(c *cli.Context) error {
 	return func(c *cli.Context) error {
 
-		trades, err := db.GetAllTrades(database)
+		trades, err := db.GetAllTrades()
 		if err != nil {
 			return err
 		}
 
 		for key, trade := range trades {
+			var stock_current_price *models.StockPrice
+			stock_current_price, err = db.GetStockPrice(trade.Ticker)
+
+			earns_or_losses := (stock_current_price.Price * trade.Quantity) - (trade.Price * trade.Quantity)
+			fmt.Println(earns_or_losses)
+			var background string
+			if earns_or_losses > 0 {
+				background = "\033[30m\u001b[42m"
+			} else {
+				background = "\033[30m\u001b[41m"
+			}
+
 			curr := "R$"
 			if trade.Currency == "USD" {
 				curr = "$"
 			}
 
-			fmt.Printf("(%d) %s   -   %s   -   %f   -   %s%f\n", key, trade.Date.Format(helpers.GetLayoutDate()), trade.Ticker, trade.Quantity, curr, trade.Price)
+			fmt.Printf("(%d) %s   -   %s   -   %.2f   -   %s%.2f %s%s%.2f\u001b[0m\033[m\n", key, trade.Date.Format(helpers.GetLayoutDate()), trade.Ticker, trade.Quantity, curr, trade.Price, background, curr, earns_or_losses)
 
 		}
 
@@ -31,7 +43,7 @@ func list(database *sql.DB) func(c *cli.Context) error {
 	}
 }
 
-func ListCommand(database *sql.DB) *cli.Command {
+func ListCommand() *cli.Command {
 
 	return &cli.Command{
 		Name:    "list",
@@ -61,6 +73,6 @@ func ListCommand(database *sql.DB) *cli.Command {
 				Usage: "Date of the operation in the format YYYY-MM-DD. If ommited, will sort all by newest to oldest",
 			},
 		},
-		Action: list(database),
+		Action: list(),
 	}
 }

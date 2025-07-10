@@ -2,37 +2,30 @@ package db
 
 import (
 	"database/sql"
-	"os"
+	"fmt"
 	"time"
 
 	"github.com/Felipalds/go-stocks/pkg/helpers"
 	"github.com/Felipalds/go-stocks/pkg/models"
 
-	"github.com/charmbracelet/log"
 	_ "github.com/mattn/go-sqlite3"
 )
 
-func InitDB(path string) (*sql.DB, error) {
-	log.Info("Initializing database...")
-	db, err := sql.Open("sqlite3", path)
+var db *sql.DB
+
+const INIT_SQL = "../../init.sql"
+
+func InitDB() error {
+	// log.Info("Initializing database...")
+	db, err := sql.Open("sqlite3", INIT_SQL)
 	if err != nil {
-		return nil, err
+		return err
 	}
 
-	return db, db.Ping()
+	return db.Ping()
 }
 
-func CreateTables(db *sql.DB, path string) error {
-	log.Info("Initializing tables...")
-	content, err := os.ReadFile(path)
-	if err != nil {
-		return nil
-	}
-	_, err = db.Exec(string(content))
-	return err
-}
-
-func InsertTrade(db *sql.DB, trade models.Trade) error {
+func InsertTrade(trade models.Trade) error {
 	query := `
 		INSERT INTO trades (ticker, price, quantity, date, operation, tax, currency)
 		VALUES (?, ?, ?, ?, ?, ?, ?)
@@ -42,7 +35,7 @@ func InsertTrade(db *sql.DB, trade models.Trade) error {
 	return err
 }
 
-func GetAllTrades(db *sql.DB) ([]models.Trade, error) {
+func GetAllTrades() ([]models.Trade, error) {
 	rows, err := db.Query("SELECT id, ticker, price, quantity, date, operation, tax, currency FROM trades")
 	if err != nil {
 		return nil, err
@@ -64,5 +57,35 @@ func GetAllTrades(db *sql.DB) ([]models.Trade, error) {
 		trades = append(trades, t)
 	}
 	return trades, nil
+}
 
+func GetStockPrice(ticker string) (*models.StockPrice, error) {
+	var stock_price models.StockPrice
+	query := `SELECT id, ticker, price, currency FROM stock_prices WHERE ticker = ? LIMIT 1`
+	err := db.QueryRow(query, ticker).Scan(&stock_price.ID, &stock_price.Ticker, &stock_price.Price, &stock_price.Currency)
+
+	if err == sql.ErrNoRows {
+		return nil, fmt.Errorf("ticker %s not found", ticker)
+	} else if err != nil {
+		return nil, fmt.Errorf("error querying ticker %s: %w", ticker, err)
+	}
+
+	return &stock_price, nil
+}
+
+// https://sqlite.org/lang_upsert.html
+func UpdateStockPrices(ticker string, price float64, currency models.Currency) error {
+
+	upsertSQL := `
+		INSERT INTO stock_prices (ticker, price, currency)
+	  VALUES (?, ?, ?)
+	  ON CONFLICT (ticker) DO UPDATE SET
+	  price = excluded.price;
+	`
+	_, err := db.Exec(upsertSQL, ticker, price, currency)
+	if err != nil {
+		return fmt.Errorf("error upserting ticker %w", err)
+	}
+
+	return nil
 }

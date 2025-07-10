@@ -1,9 +1,9 @@
 package commands
 
 import (
-	"database/sql"
 	"errors"
 	"fmt"
+	"strings"
 	"time"
 
 	"github.com/Felipalds/go-stocks/pkg/db"
@@ -14,10 +14,10 @@ import (
 	"github.com/urfave/cli/v2"
 )
 
-func trade(database *sql.DB) func(c *cli.Context) error {
+func trade() func(c *cli.Context) error {
 	return func(c *cli.Context) error {
 
-		ticker := c.String("ticker")
+		ticker := strings.ToUpper(c.String("ticker"))
 		qty := c.Float64("quantity")
 		price := c.Float64("price")
 		currency := c.String("currency")
@@ -66,7 +66,7 @@ func trade(database *sql.DB) func(c *cli.Context) error {
 			return err
 		}
 
-		err = db.InsertTrade(database, trade)
+		err = db.InsertTrade(trade)
 		if err != nil {
 			return err
 		}
@@ -81,7 +81,7 @@ func trade(database *sql.DB) func(c *cli.Context) error {
 	}
 }
 
-func TradeCommand(database *sql.DB) *cli.Command {
+func TradeCommand() *cli.Command {
 
 	return &cli.Command{
 		Name:  "trade",
@@ -130,6 +130,6 @@ func TradeCommand(database *sql.DB) *cli.Command {
 				Usage: "Date of the operation in the format YYYY-MM-DD. If ommited, will be used today as date.",
 			},
 		},
-		Action: trade(database),
+		Action: trade(),
 	}
 }

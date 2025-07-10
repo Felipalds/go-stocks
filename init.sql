@@ -7,4 +7,11 @@ CREATE TABLE IF NOT EXISTS trades (
   operation TEXT,
   tax REAL,
   currency TEXT
+);
+
+CREATE TABLE IF NOT EXISTS stock_prices (
+  id INTEGER PRIMARY KEY AUTOINCREMENT,
+  ticker TEXT UNIQUE,
+  price REAL,
+  currency TEXT
 )
